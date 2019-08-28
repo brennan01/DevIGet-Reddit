@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Top Posts. a client for Reddit</string>
+    <string name="non_selected_post_message">Please select a post from the list</string>
+
+</resources>
