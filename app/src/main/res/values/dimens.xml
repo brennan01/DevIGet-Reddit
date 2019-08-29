@@ -3,4 +3,12 @@
     <!-- on devices older than API 19, we don't need to pad top of nav drawer since nav drawer
     won't go "under" status bar -->
     <dimen name="nav_drawer_top_padding">0dp</dimen>
+
+    <dimen name="primary_text_size">20dp</dimen>
+    <dimen name="secondary_text_size">16dp</dimen>
+    <dimen name="thumbnail_size">84dp</dimen>
+
+    <dimen name="small_separation">4dp</dimen>
+    <dimen name="medium_separation">8dp</dimen>
+    <dimen name="large_separation">16dp</dimen>
 </resources>

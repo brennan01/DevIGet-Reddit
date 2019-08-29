@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Top Posts. a client for Reddit</string>
     <string name="non_selected_post_message">Please select a post from the list</string>
+    <string name="comments_count">%1$d comments</string>
+    <string name="dismill_all">Dismiss All</string>
+    <string name="dismill_all_count">Dismiss All (%1$d)</string>
 
 </resources>

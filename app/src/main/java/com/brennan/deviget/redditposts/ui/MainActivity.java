@@ -15,6 +15,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 import com.brennan.deviget.redditposts.R;
+import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
 import com.brennan.deviget.redditposts.domain.RedditNewsResponse;
 import com.google.android.material.navigation.NavigationView;
 
@@ -84,11 +85,11 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
                     .commit();
 
 
-            discoverCardsFragment.setListener(this);
-            discoverCardsFragment.setContext(getApplicationContext());
 
             getFragmentManager().executePendingTransactions();
         }
+        discoverCardsFragment.setListener(this);
+        discoverCardsFragment.setContext(getApplicationContext());
         discoverCardsFragment.getRedditPosts();
 
     }
@@ -105,10 +106,10 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
     }
 
     @Override
-    public void onItemClick(int itemId) {
+    public void onItemClick(RedditChildrenResponse item) {
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager()
                 .findFragmentByTag(TAG_DETAIL_FRAGMENT);
-        detailFragment.onItemClick(itemId);
+        detailFragment.onItemClick(item);
 
         // Close the navigation drawer
         if (drawerLayout != null) {
@@ -124,6 +125,12 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
     @Override
     public void onRedditPostComplete(RedditNewsResponse redditNewsResponse) {
         Log.d(TAG, "Response: " + redditNewsResponse.toString());
+
+        ListFragment listFragment = (ListFragment) getSupportFragmentManager()
+                .findFragmentByTag(TAG_MASTER_FRAGMENT);
+
+        listFragment.setItems(redditNewsResponse.getData());
+
 
     }
 

@@ -1,17 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@color/grey">
 
-    <!-- TODO Replace this  list with recyclerview -->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium_separation"
+        android:textSize="@dimen/primary_text_size"
+        android:textStyle="bold"
+        tools:text="Author" />
+
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:layout_margin="@dimen/small_separation"
+        android:layout_gravity="center"
+        tools:background="@drawable/ic_launcher_background"
+        tools:src="@drawable/ic_launcher_foreground" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/small_separation"
+        android:textSize="@dimen/secondary_text_size"
+        tools:text="Title" />
+
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/non_selected_post_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="36dp"
+        android:textSize="@dimen/primary_text_size"
         android:layout_margin="24dp"
         android:gravity="center"
         android:text="@string/non_selected_post_message"/>

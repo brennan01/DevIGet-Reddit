@@ -10,6 +10,9 @@ public class RedditNewsDataResponse implements Serializable {
     @SerializedName("author_fullname")
     @Expose
     private String authorFullname;
+    @SerializedName("title")
+    @Expose
+    private String title;
     @SerializedName("created")
     @Expose
     private long created;
@@ -74,11 +77,20 @@ public class RedditNewsDataResponse implements Serializable {
         this.numComments = numComments;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
 
     @Override
     public String toString() {
         return "RedditNewsDataResponse{" +
                 "authorFullname='" + authorFullname + '\'' +
+                ", title='" + title + '\'' +
                 ", created=" + created +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", thumbnailWidth=" + thumbnailWidth +

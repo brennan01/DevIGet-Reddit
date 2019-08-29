@@ -9,20 +9,27 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.brennan.deviget.redditposts.R;
+import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
+import com.brennan.deviget.redditposts.domain.RedditDataResponse;
 
 
 public class ListFragment extends Fragment {
 
     private Listener mListener;
+    private RecyclerView mRecyclerView;
+    private RedditPostAdapter mAdapter;
+    private TextView mDismisAll;
 
     public static ListFragment newInstance() {
         return new ListFragment();
     }
 
     interface Listener {
-        void onItemClick(int itemId);
+        void onItemClick(RedditChildrenResponse item);
     }
 
     @Override
@@ -42,24 +49,31 @@ public class ListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
-        TextView textView1 = view.findViewById(R.id.master_item_1);
-        textView1.setOnClickListener(new View.OnClickListener() {
+        mRecyclerView = view.findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAdapter = new RedditPostAdapter(null);
+        mAdapter.setListener(new RedditPostAdapter.Listener() {
             @Override
-            public void onClick(View v) {
-                mListener.onItemClick(1);
+            public void onItemClick(int position, RedditChildrenResponse item) {
+                if(mListener != null){
+                    mListener.onItemClick(item);
+                }
             }
         });
 
-        TextView textView2 = view.findViewById(R.id.master_item_2);
-        textView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onItemClick(2);
-            }
-        });
-
+        mRecyclerView.setAdapter(mAdapter);
+        mDismisAll = view.findViewById(R.id.dismiss_all);
 
         return view;
+    }
+
+    public void setItems(RedditDataResponse data){
+        mAdapter.updateInfo(data);
+        if(data.getChildren().size() == 0){
+            mDismisAll.setText(getString(R.string.dismill_all));
+        } else {
+            mDismisAll.setText(getString(R.string.dismill_all_count,  data.getChildren().size()));
+        }
     }
 
     @Override

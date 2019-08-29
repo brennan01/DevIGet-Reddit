@@ -1,27 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/holo_blue_dark"
-              android:paddingTop="@dimen/nav_drawer_top_padding"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/list_background"
+    android:paddingTop="@dimen/nav_drawer_top_padding"
+    android:orientation="vertical">
 
     <!-- Replace this simple list with recyclerview or however you
         want to generate your master list -->
 
-    <TextView
-        android:id="@+id/master_item_1"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="master list item 1"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/post_row"
+        />
 
     <TextView
-        android:id="@+id/master_item_2"
+        android:id="@+id/dismiss_all"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:text="master list item 2"/>
+        android:background="@color/black"
+        android:textColor="@color/comments_color"
+        android:textSize="@dimen/secondary_text_size"
+        android:gravity="center"
+        android:text="@string/dismill_all"/>
+
+
 
 
 </LinearLayout>
