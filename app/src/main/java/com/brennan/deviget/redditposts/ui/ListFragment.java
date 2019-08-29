@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,8 +17,13 @@ import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
 import com.brennan.deviget.redditposts.domain.RedditDataResponse;
 
+import java.util.List;
+
 
 public class ListFragment extends Fragment {
+
+    private static final String TAG = "ListFragment";
+    private static final String POSTS_LIST = "posts_list";
 
     private Listener mListener;
     private RecyclerView mRecyclerView;
@@ -41,6 +47,20 @@ public class ListFragment extends Fragment {
         mListener = (Listener) context;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAdapter = new RedditPostAdapter(null);
+        mAdapter.setListener(new RedditPostAdapter.Listener() {
+            @Override
+            public void onItemClick(int position, RedditChildrenResponse item) {
+                if(mListener != null){
+                    mListener.onItemClick(item);
+                }
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -51,34 +71,47 @@ public class ListFragment extends Fragment {
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new RedditPostAdapter(null);
-        mAdapter.setListener(new RedditPostAdapter.Listener() {
-            @Override
-            public void onItemClick(int position, RedditChildrenResponse item) {
-                if(mListener != null){
-                    mListener.onItemClick(item);
-                }
-            }
-        });
-
         mRecyclerView.setAdapter(mAdapter);
         mDismisAll = view.findViewById(R.id.dismiss_all);
-
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if(savedInstanceState != null && savedInstanceState.getSerializable(POSTS_LIST) != null){
+            RedditDataResponse data = (RedditDataResponse) savedInstanceState.getSerializable(POSTS_LIST);
+            mAdapter.setRedditDataResponse(data);
+        }
+
+        List<RedditChildrenResponse> items = mAdapter.getItems();
+        if(items == null || items.size() == 0){
+            mDismisAll.setText(getString(R.string.dismill_all));
+        } else {
+            mDismisAll.setText(getString(R.string.dismill_all_count,  items.size()));
+        }
     }
 
     public void setItems(RedditDataResponse data){
         mAdapter.updateInfo(data);
-        if(data.getChildren().size() == 0){
-            mDismisAll.setText(getString(R.string.dismill_all));
-        } else {
-            mDismisAll.setText(getString(R.string.dismill_all_count,  data.getChildren().size()));
-        }
+
+    }
+
+    private RedditDataResponse getItems(){
+        return mAdapter.getRedditDataResponse();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(POSTS_LIST, getItems());
+
     }
 }

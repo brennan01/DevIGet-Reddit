@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
+import com.brennan.deviget.redditposts.domain.RedditDataResponse;
 import com.brennan.deviget.redditposts.domain.RedditNewsResponse;
 import com.google.android.material.navigation.NavigationView;
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
     private static final String TAG_DETAIL_FRAGMENT = "TAG_DETAIL_FRAGMENT";
     private static final String TAG = "MainActivity";
     private static final String GET_REDDIT_POSTS_FRAGMENT_TAG = "GET_REDDIT_POSTS_FRAGMENT_TAG";
+    private static final String POSTS_LIST = "post_list";
     private DrawerLayout drawerLayout;
 
     @Override
@@ -63,36 +65,56 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
         }
 
         // insert detail fragment into detail container
-        DetailFragment detailFragment = DetailFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.detail_fragment_container, detailFragment, TAG_DETAIL_FRAGMENT)
-                .commit();
 
-        // insert master fragment into master container (i.e. nav view)
-        ListFragment masterFragment = ListFragment.newInstance();
-        fragmentManager.beginTransaction()
-                .replace(postsListFragmentContainerId, masterFragment, TAG_MASTER_FRAGMENT)
-                .commit();
+        if (savedInstanceState == null) {
 
-        GetRedditPostFragment discoverCardsFragment = (GetRedditPostFragment) getSupportFragmentManager()
-                .findFragmentByTag(GET_REDDIT_POSTS_FRAGMENT_TAG);
-
-        if(discoverCardsFragment == null){
-            discoverCardsFragment = GetRedditPostFragment.newInstance();
+            Log.d(TAG, "onCrateView. Bundle Null");
+            DetailFragment detailFragment = DetailFragment.newInstance();
             fragmentManager.beginTransaction()
-                    .add(discoverCardsFragment, GET_REDDIT_POSTS_FRAGMENT_TAG)
+                    .replace(R.id.detail_fragment_container, detailFragment, TAG_DETAIL_FRAGMENT)
                     .commit();
 
+            // insert master fragment into master container (i.e. nav view)
+            ListFragment masterFragment = ListFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .replace(postsListFragmentContainerId, masterFragment, TAG_MASTER_FRAGMENT)
+                    .commit();
+
+            fragmentManager.executePendingTransactions();
 
 
-            getFragmentManager().executePendingTransactions();
+            loadInfo();
+        } else {
+            ListFragment masterFragment = (ListFragment) fragmentManager.findFragmentByTag(TAG_MASTER_FRAGMENT);
+            fragmentManager.beginTransaction().remove(masterFragment).commit();
+            fragmentManager.executePendingTransactions();
+
+            fragmentManager.beginTransaction().replace(postsListFragmentContainerId, masterFragment, TAG_MASTER_FRAGMENT).commit();
+            fragmentManager.executePendingTransactions();
         }
-        discoverCardsFragment.setListener(this);
-        discoverCardsFragment.setContext(getApplicationContext());
-        discoverCardsFragment.getRedditPosts();
 
     }
+
+
+    private void loadInfo() {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        GetRedditPostFragment getRedditPostFragment = (GetRedditPostFragment) getSupportFragmentManager()
+                .findFragmentByTag(GET_REDDIT_POSTS_FRAGMENT_TAG);
+
+        if(getRedditPostFragment == null){
+            getRedditPostFragment = GetRedditPostFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .add(getRedditPostFragment, GET_REDDIT_POSTS_FRAGMENT_TAG)
+                    .commit();
+            getFragmentManager().executePendingTransactions();
+        }
+        getRedditPostFragment.setListener(this);
+        getRedditPostFragment.setContext(getApplicationContext());
+        getRedditPostFragment.getRedditPosts();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
@@ -124,15 +146,19 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
 
     @Override
     public void onRedditPostComplete(RedditNewsResponse redditNewsResponse) {
-        Log.d(TAG, "Response: " + redditNewsResponse.toString());
+        Log.d(TAG, "Response: " + redditNewsResponse.getData().getChildren().size());
 
+        setItems(redditNewsResponse.getData());
+    }
+
+    private void setItems(RedditDataResponse mRedditDataResponse) {
         ListFragment listFragment = (ListFragment) getSupportFragmentManager()
                 .findFragmentByTag(TAG_MASTER_FRAGMENT);
 
-        listFragment.setItems(redditNewsResponse.getData());
-
+        listFragment.setItems(mRedditDataResponse);
 
     }
+
 
     @Override
     public void onRedditPostFailed(Throwable e) {

@@ -47,6 +47,15 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
         return mRedditDataResponse == null ? null : mRedditDataResponse.getChildren();
     }
 
+    public RedditDataResponse getRedditDataResponse() {
+        return mRedditDataResponse;
+    }
+
+    public void setRedditDataResponse(RedditDataResponse mRedditDataResponse) {
+        this.mRedditDataResponse = mRedditDataResponse;
+        notifyDataSetChanged();
+    }
+
     public void setListener(Listener mListener) {
         this.mListener = mListener;
     }
