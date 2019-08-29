@@ -2,6 +2,7 @@ package com.brennan.deviget.redditposts.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +11,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
 import com.brennan.deviget.redditposts.domain.RedditDataResponse;
+import com.brennan.deviget.redditposts.domain.RedditNewsResponse;
 
 import java.util.List;
 
 
-public class ListFragment extends Fragment {
+public class ListFragment extends Fragment implements GetRedditPostFragment.Listener {
 
     private static final String TAG = "ListFragment";
     private static final String POSTS_LIST = "posts_list";
+    private static final String GET_REDDIT_POSTS_FRAGMENT_TAG = "GET_REDDIT_POSTS_FRAGMENT_TAG";
 
     private Listener mListener;
     private RecyclerView mRecyclerView;
@@ -83,6 +87,8 @@ public class ListFragment extends Fragment {
         if(savedInstanceState != null && savedInstanceState.getSerializable(POSTS_LIST) != null){
             RedditDataResponse data = (RedditDataResponse) savedInstanceState.getSerializable(POSTS_LIST);
             mAdapter.setRedditDataResponse(data);
+        } else {
+            loadInfo();
         }
 
         List<RedditChildrenResponse> items = mAdapter.getItems();
@@ -91,6 +97,23 @@ public class ListFragment extends Fragment {
         } else {
             mDismisAll.setText(getString(R.string.dismill_all_count,  items.size()));
         }
+    }
+
+    private void loadInfo() {
+
+        FragmentManager fragmentManager = getFragmentManager();
+        GetRedditPostFragment getRedditPostFragment = (GetRedditPostFragment) getFragmentManager()
+                .findFragmentByTag(GET_REDDIT_POSTS_FRAGMENT_TAG);
+
+        if(getRedditPostFragment == null){
+            getRedditPostFragment = GetRedditPostFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .add(getRedditPostFragment, GET_REDDIT_POSTS_FRAGMENT_TAG)
+                    .commit();
+        }
+        getRedditPostFragment.setListener(this);
+        getRedditPostFragment.setContext(getContext());
+        getRedditPostFragment.getRedditPosts();
     }
 
     public void setItems(RedditDataResponse data){
@@ -112,6 +135,23 @@ public class ListFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(POSTS_LIST, getItems());
+
+    }
+
+
+    @Override
+    public void onRedditPostStart() {
+
+    }
+
+    @Override
+    public void onRedditPostComplete(RedditNewsResponse redditNewsResponse) {
+        setItems(redditNewsResponse.getData());
+    }
+
+    @Override
+    public void onRedditPostFailed(Throwable e) {
+        Log.d(TAG, "Error", e);
 
     }
 }

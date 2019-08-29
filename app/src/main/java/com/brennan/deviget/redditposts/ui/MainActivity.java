@@ -3,7 +3,6 @@ package com.brennan.deviget.redditposts.ui;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,12 +15,10 @@ import androidx.fragment.app.FragmentManager;
 
 import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
-import com.brennan.deviget.redditposts.domain.RedditDataResponse;
-import com.brennan.deviget.redditposts.domain.RedditNewsResponse;
 import com.google.android.material.navigation.NavigationView;
 
 
-public class MainActivity extends AppCompatActivity implements ListFragment.Listener, GetRedditPostFragment.Listener {
+public class MainActivity extends AppCompatActivity implements ListFragment.Listener{
 
     private static final String TAG_MASTER_FRAGMENT = "TAG_MASTER_FRAGMENT";
     private static final String TAG_DETAIL_FRAGMENT = "TAG_DETAIL_FRAGMENT";
@@ -84,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
             fragmentManager.executePendingTransactions();
 
 
-            loadInfo();
         } else {
             ListFragment masterFragment = (ListFragment) fragmentManager.findFragmentByTag(TAG_MASTER_FRAGMENT);
             fragmentManager.beginTransaction().remove(masterFragment).commit();
@@ -94,25 +90,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
             fragmentManager.executePendingTransactions();
         }
 
-    }
-
-
-    private void loadInfo() {
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        GetRedditPostFragment getRedditPostFragment = (GetRedditPostFragment) getSupportFragmentManager()
-                .findFragmentByTag(GET_REDDIT_POSTS_FRAGMENT_TAG);
-
-        if(getRedditPostFragment == null){
-            getRedditPostFragment = GetRedditPostFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(getRedditPostFragment, GET_REDDIT_POSTS_FRAGMENT_TAG)
-                    .commit();
-            getFragmentManager().executePendingTransactions();
-        }
-        getRedditPostFragment.setListener(this);
-        getRedditPostFragment.setContext(getApplicationContext());
-        getRedditPostFragment.getRedditPosts();
     }
 
     @Override
@@ -139,30 +116,4 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
         }
     }
 
-    @Override
-    public void onRedditPostStart() {
-
-    }
-
-    @Override
-    public void onRedditPostComplete(RedditNewsResponse redditNewsResponse) {
-        Log.d(TAG, "Response: " + redditNewsResponse.getData().getChildren().size());
-
-        setItems(redditNewsResponse.getData());
-    }
-
-    private void setItems(RedditDataResponse mRedditDataResponse) {
-        ListFragment listFragment = (ListFragment) getSupportFragmentManager()
-                .findFragmentByTag(TAG_MASTER_FRAGMENT);
-
-        listFragment.setItems(mRedditDataResponse);
-
-    }
-
-
-    @Override
-    public void onRedditPostFailed(Throwable e) {
-        Toast.makeText(this, "Error" + e.getStackTrace(), Toast.LENGTH_SHORT).show();
-
-    }
 }
