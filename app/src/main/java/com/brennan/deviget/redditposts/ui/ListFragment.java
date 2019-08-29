@@ -1,6 +1,7 @@
 package com.brennan.deviget.redditposts.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,11 +15,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
 import com.brennan.deviget.redditposts.domain.RedditDataResponse;
 import com.brennan.deviget.redditposts.domain.RedditNewsResponse;
+import com.brennan.deviget.redditposts.ui.commons.EndlessRecyclerOnScrollListener;
 
 import java.util.List;
 
@@ -31,8 +34,12 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
 
     private Listener mListener;
     private RecyclerView mRecyclerView;
+    private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
+
     private RedditPostAdapter mAdapter;
     private TextView mDismisAll;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
 
     public static ListFragment newInstance() {
         return new ListFragment();
@@ -77,6 +84,24 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
         mDismisAll = view.findViewById(R.id.dismiss_all);
+
+        mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
+            @Override
+            public void onLoadMore() {
+                loadMoreInfo(mAdapter.getAfter());
+            }
+        };
+
+        mRecyclerView.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+
+        mSwipeRefreshLayout = view.findViewById(R.id.refresh);
+        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.RED, Color.BLUE);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadFreshInfo();
+            }
+        });
         return view;
     }
 
@@ -86,20 +111,20 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
 
         if(savedInstanceState != null && savedInstanceState.getSerializable(POSTS_LIST) != null){
             RedditDataResponse data = (RedditDataResponse) savedInstanceState.getSerializable(POSTS_LIST);
-            mAdapter.setRedditDataResponse(data);
+            setItems(data);
         } else {
-            loadInfo();
+            loadFreshInfo();
         }
 
-        List<RedditChildrenResponse> items = mAdapter.getItems();
-        if(items == null || items.size() == 0){
-            mDismisAll.setText(getString(R.string.dismill_all));
-        } else {
-            mDismisAll.setText(getString(R.string.dismill_all_count,  items.size()));
-        }
     }
 
-    private void loadInfo() {
+    private void loadFreshInfo(){
+        mEndlessRecyclerOnScrollListener.reset();
+        mAdapter.clear();
+        loadMoreInfo("");
+    }
+
+    private void loadMoreInfo(String after) {
 
         FragmentManager fragmentManager = getFragmentManager();
         GetRedditPostFragment getRedditPostFragment = (GetRedditPostFragment) getFragmentManager()
@@ -113,11 +138,17 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
         }
         getRedditPostFragment.setListener(this);
         getRedditPostFragment.setContext(getContext());
-        getRedditPostFragment.getRedditPosts();
+        getRedditPostFragment.getRedditPosts(after);
     }
 
     public void setItems(RedditDataResponse data){
         mAdapter.updateInfo(data);
+        List<RedditChildrenResponse> items = mAdapter.getItems();
+        if(items == null || items.size() == 0){
+            mDismisAll.setText(getString(R.string.dismill_all));
+        } else {
+            mDismisAll.setText(getString(R.string.dismill_all_count,  items.size()));
+        }
 
     }
 
@@ -141,16 +172,18 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
 
     @Override
     public void onRedditPostStart() {
-
+        mSwipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void onRedditPostComplete(RedditNewsResponse redditNewsResponse) {
+        mSwipeRefreshLayout.setRefreshing(false);
         setItems(redditNewsResponse.getData());
     }
 
     @Override
     public void onRedditPostFailed(Throwable e) {
+        mSwipeRefreshLayout.setRefreshing(false);
         Log.d(TAG, "Error", e);
 
     }

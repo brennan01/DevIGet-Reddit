@@ -23,6 +23,12 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
 
     private RedditDataResponse mRedditDataResponse;
     private Listener mListener;
+    private String mAfter;
+
+    public void clear() {
+        mRedditDataResponse = null;
+        notifyDataSetChanged();
+    }
 
     public interface Listener {
         void onItemClick(int position, RedditChildrenResponse item);
@@ -40,7 +46,13 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
             mRedditDataResponse.getChildren().addAll(redditDataResponse.getChildren());
         }
 
+        mAfter = redditDataResponse.getAfter();
+
         notifyDataSetChanged();
+    }
+
+    public String getAfter() {
+        return mAfter;
     }
 
     public List<RedditChildrenResponse> getItems() {
@@ -49,11 +61,6 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
 
     public RedditDataResponse getRedditDataResponse() {
         return mRedditDataResponse;
-    }
-
-    public void setRedditDataResponse(RedditDataResponse mRedditDataResponse) {
-        this.mRedditDataResponse = mRedditDataResponse;
-        notifyDataSetChanged();
     }
 
     public void setListener(Listener mListener) {

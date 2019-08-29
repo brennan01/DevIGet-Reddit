@@ -2,7 +2,7 @@ package com.brennan.deviget.redditposts.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -65,15 +65,14 @@ public class GetRedditPostFragment extends Fragment {
         mListener = null;
     }
 
-    public void getRedditPosts(){
+    public void getRedditPosts(String after){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://www.reddit.com")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         RedditService redditService = retrofit.create(RedditService.class);
-
-        Call<RedditNewsResponse> call = redditService.getTop("", "");
+        Call<RedditNewsResponse> call = redditService.getTop(after == null ? "" : after, "50");
 
         if (mListener != null) {
             mListener.onRedditPostStart();
