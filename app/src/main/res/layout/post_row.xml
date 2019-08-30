@@ -88,8 +88,9 @@
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:padding="12dp"
-                android:src="@android:drawable/btn_dialog" />
+                android:padding="8dp"
+                android:src="@drawable/ic_dismiss"
+                android:tint="@color/comments_color"/>
 
             <TextView
                 android:id="@+id/dismiss_post_text"
@@ -105,10 +106,9 @@
             <TextView
                 android:id="@+id/comments"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="4323 comments"
-                android:layout_marginEnd="@dimen/large_separation"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                tools:text="4323 comments"
                 android:textColor="@color/comments_color"
                 android:textSize="@dimen/secondary_text_size" />
         </LinearLayout>
@@ -128,10 +128,11 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@android:drawable/btn_dialog" />
+            android:src="@drawable/ic_chevron"
+            android:tint="@color/grey"/>
 
     </LinearLayout>
 

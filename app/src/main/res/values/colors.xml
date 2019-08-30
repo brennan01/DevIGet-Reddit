@@ -12,7 +12,9 @@
 
     <color name="primary_text_color">#FFFFFF</color>
     <color name="secondary_text_color">#80FFFFFF</color>
-    <color name="comments_color">#FF9800</color>
+    <color name="comments_color">#CCFF9800</color>
+    <color name="dismiss_color">#FF9800</color>
+
 
     <color name="list_background">#CC000000</color>
 
