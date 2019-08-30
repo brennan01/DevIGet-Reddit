@@ -23,6 +23,7 @@ import com.brennan.deviget.redditposts.domain.RedditDataResponse;
 import com.brennan.deviget.redditposts.domain.RedditNewsResponse;
 import com.brennan.deviget.redditposts.ui.commons.EndlessRecyclerOnScrollListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -30,6 +31,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
 
     private static final String TAG = "ListFragment";
     private static final String POSTS_LIST = "posts_list";
+    private static final String READ_POSTS_LIST = "read_posts_list";
     private static final String GET_REDDIT_POSTS_FRAGMENT_TAG = "GET_REDDIT_POSTS_FRAGMENT_TAG";
 
     private Listener mListener;
@@ -61,7 +63,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new RedditPostAdapter(null);
+        mAdapter = new RedditPostAdapter();
         mAdapter.setListener(new RedditPostAdapter.Listener() {
             @Override
             public void onItemClick(int position, RedditChildrenResponse item) {
@@ -116,7 +118,9 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
 
         if(savedInstanceState != null && savedInstanceState.getSerializable(POSTS_LIST) != null){
             RedditDataResponse data = (RedditDataResponse) savedInstanceState.getSerializable(POSTS_LIST);
-            setItems(data);
+            ArrayList<RedditChildrenResponse> readPosts = (ArrayList<RedditChildrenResponse>) savedInstanceState.getSerializable(READ_POSTS_LIST);
+            mAdapter.init(data, readPosts);
+            updateDismissView();
         } else {
             loadFreshInfo();
         }
@@ -146,15 +150,18 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
         getRedditPostFragment.getRedditPosts(after);
     }
 
-    public void setItems(RedditDataResponse data){
-        mAdapter.updateInfo(data);
+    public void addItems(RedditDataResponse data){
+        mAdapter.addItems(data);
+        updateDismissView();
+    }
+
+    private void updateDismissView() {
         List<RedditChildrenResponse> items = mAdapter.getItems();
         if(items == null || items.size() == 0){
             mDismisAll.setText(getString(R.string.dismill_all));
         } else {
             mDismisAll.setText(getString(R.string.dismill_all_count,  items.size()));
         }
-
     }
 
     private RedditDataResponse getItems(){
@@ -171,6 +178,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(POSTS_LIST, getItems());
+        outState.putSerializable(READ_POSTS_LIST, mAdapter.getReadPosts());
 
     }
 
@@ -183,7 +191,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
     @Override
     public void onRedditPostComplete(RedditNewsResponse redditNewsResponse) {
         mSwipeRefreshLayout.setRefreshing(false);
-        setItems(redditNewsResponse.getData());
+        addItems(redditNewsResponse.getData());
     }
 
     @Override

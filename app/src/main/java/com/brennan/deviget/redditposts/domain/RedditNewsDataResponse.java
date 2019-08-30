@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class RedditNewsDataResponse implements Serializable {
 
@@ -85,6 +86,24 @@ public class RedditNewsDataResponse implements Serializable {
         this.title = title;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RedditNewsDataResponse that = (RedditNewsDataResponse) o;
+        return created == that.created &&
+                thumbnailWidth == that.thumbnailWidth &&
+                thumbnailHeight == that.thumbnailHeight &&
+                numComments == that.numComments &&
+                Objects.equals(authorFullname, that.authorFullname) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(thumbnail, that.thumbnail);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(authorFullname, title, created, thumbnail, thumbnailWidth, thumbnailHeight, numComments);
+    }
 
     @Override
     public String toString() {

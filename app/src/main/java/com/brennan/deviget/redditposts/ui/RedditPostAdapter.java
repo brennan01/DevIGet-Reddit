@@ -16,6 +16,7 @@ import com.brennan.deviget.redditposts.domain.RedditNewsDataResponse;
 import com.squareup.picasso.Picasso;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,6 +26,7 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
     private RedditDataResponse mRedditDataResponse;
     private Listener mListener;
     private String mAfter;
+    private ArrayList<RedditChildrenResponse> mReadPosts = new ArrayList<>();
 
     public void clear() {
         mRedditDataResponse = null;
@@ -43,20 +45,22 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
         void onDismissItemClick(int position, RedditChildrenResponse item);
     }
 
-    public RedditPostAdapter(RedditDataResponse response) {
-        mRedditDataResponse = response;
+    public RedditPostAdapter() {
     }
 
-    public void updateInfo(RedditDataResponse redditDataResponse){
+    public void init(RedditDataResponse redditDataResponse, ArrayList<RedditChildrenResponse> readPosts){
+        mReadPosts = readPosts;
+        addItems(redditDataResponse);
+    }
+
+    public void addItems(RedditDataResponse redditDataResponse){
         if(mRedditDataResponse == null){
             mRedditDataResponse = redditDataResponse;
         } else {
-            //TODO update paging info
             mRedditDataResponse.getChildren().addAll(redditDataResponse.getChildren());
         }
 
         mAfter = redditDataResponse.getAfter();
-
         notifyDataSetChanged();
     }
 
@@ -70,6 +74,11 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
 
     public RedditDataResponse getRedditDataResponse() {
         return mRedditDataResponse;
+    }
+
+
+    public ArrayList<RedditChildrenResponse> getReadPosts() {
+        return mReadPosts;
     }
 
     public void setListener(Listener mListener) {
@@ -109,6 +118,7 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
         TextView comments;
         ImageView thumbnail;
         ViewGroup item;
+        View badge;
         View dismissButton;
         View dismissText;
 
@@ -121,13 +131,13 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
             comments = itemView.findViewById(R.id.comments);
             dismissButton = itemView.findViewById(R.id.dismiss_post_image_view);
             dismissText = itemView.findViewById(R.id.dismiss_post_text);
-
+            badge = item.findViewById(R.id.badge);
 
             thumbnail = itemView.findViewById(R.id.thumbnail);
 
         }
 
-        public void bind(final int position, final RedditChildrenResponse childrenResponse) {
+        public void bind(final int position, RedditChildrenResponse childrenResponse) {
 
             final RedditNewsDataResponse post = childrenResponse.getData();
 
@@ -148,27 +158,43 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
                 }
             });
 
+            if(mReadPosts.contains(childrenResponse)){
+                badge.setVisibility(View.INVISIBLE);
+            } else {
+                badge.setVisibility(View.VISIBLE);
+            }
+
+
+
+            //OnClick Listener
+            this.item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int newPosition = getAdapterPosition();
+                    RedditChildrenResponse item = mRedditDataResponse.getChildren().get(newPosition);
+                    mReadPosts.add(item);
+                    notifyItemChanged(newPosition);
+                    if (mListener != null) {
+                        mListener.onItemClick(newPosition, item);
+                    }
+                }
+            });
+
+            //OnDismissClick Listener
             View.OnClickListener onDismissClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mListener != null) {
                         int newPosition = getAdapterPosition();
-                        mListener.onDismissItemClick(newPosition, childrenResponse);
+                        RedditChildrenResponse item = mRedditDataResponse.getChildren().get(newPosition);
+
+                        mListener.onDismissItemClick(newPosition, item);
                     }
                 }
             };
             dismissText.setOnClickListener(onDismissClickListener);
             dismissButton.setOnClickListener(onDismissClickListener);
 
-            this.item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mListener != null) {
-                        int newPosition = getAdapterPosition();
-                        mListener.onItemClick(newPosition, childrenResponse);
-                    }
-                }
-            });
         }
     }
 }
