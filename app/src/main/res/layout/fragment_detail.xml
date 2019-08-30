@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:padding="@dimen/large_separation"
     android:background="@color/grey">
-
-
 
     <LinearLayout
         android:id="@+id/post_content"
@@ -19,14 +18,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/medium_separation"
-        android:textSize="@dimen/primary_text_size"
+        android:textSize="24dp"
+        android:layout_margin="@dimen/medium_separation"
         android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
         tools:text="Author" />
 
     <ImageView
         android:id="@+id/thumbnail"
-        android:layout_width="84dp"
-        android:layout_height="84dp"
+        android:layout_width="184dp"
+        android:layout_height="184dp"
         android:layout_margin="@dimen/small_separation"
         android:layout_gravity="center"
         tools:background="@drawable/ic_launcher_background"
@@ -36,9 +38,11 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:paddingHorizontal="@dimen/small_separation"
-        android:textSize="@dimen/secondary_text_size"
+        android:layout_marginTop="@dimen/medium_separation"
+        android:textSize="@dimen/primary_text_size"
+        android:textColor="@color/black"
         tools:text="Title" />
 
     </LinearLayout>
@@ -52,6 +56,7 @@
         android:layout_gravity="center"
         android:textSize="@dimen/primary_text_size"
         android:layout_margin="24dp"
+        android:textColor="@color/black"
         android:gravity="center"
         android:text="@string/non_selected_post_message"/>
 

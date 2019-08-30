@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
 import com.brennan.deviget.redditposts.domain.RedditNewsDataResponse;
+import com.brennan.deviget.redditposts.utils.UrlUtils;
 import com.squareup.picasso.Picasso;
 
 public class DetailFragment extends Fragment {
@@ -81,6 +82,13 @@ public class DetailFragment extends Fragment {
                     String iconUrl = post.getThumbnail();
                     iconUrl = iconUrl == null || iconUrl.isEmpty() ? null : iconUrl;
                     Picasso.get().load(iconUrl).into(mThumbnail);
+                }
+            });
+
+            mThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UrlUtils.openWebPage(getContext(), post.getThumbnail());
                 }
             });
         }
