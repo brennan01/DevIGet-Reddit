@@ -29,6 +29,15 @@ public class RedditNewsDataResponse implements Serializable {
     @SerializedName("num_comments")
     @Expose
     private long numComments;
+    private String authorLegibleName;
+
+    public String getAuthorLegibleName() {
+        return authorLegibleName;
+    }
+
+    public void setAuthorLegibleName(String authorLegibleName) {
+        this.authorLegibleName = authorLegibleName;
+    }
 
     public String getAuthorFullname() {
         return authorFullname;

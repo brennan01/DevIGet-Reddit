@@ -74,7 +74,7 @@ public class DetailFragment extends Fragment {
 
             final RedditNewsDataResponse post = item.getData();
             mTitle.setText(post.getTitle());
-            mAuthor.setText(post.getAuthorFullname());
+            mAuthor.setText(post.getAuthorLegibleName());
 
             mThumbnail.post(new Runnable() {
                 @Override

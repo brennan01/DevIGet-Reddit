@@ -1,10 +1,13 @@
 package com.brennan.deviget.redditposts.domain;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 public class RedditDataResponse implements Serializable {
 
@@ -30,6 +33,24 @@ public class RedditDataResponse implements Serializable {
 
     public void setModhash(String modhash) {
         this.modhash = modhash;
+    }
+
+    public String getAuthorIds(){
+        StringBuilder namesStr = new StringBuilder();
+
+        for (RedditChildrenResponse currentChild : children) {
+            String authorFullNameId = currentChild.getData().getAuthorFullname();
+            namesStr = namesStr.length() > 0
+                    ? namesStr.append(",").append(authorFullNameId)
+                    : namesStr.append(authorFullNameId);
+        }
+        return namesStr.toString();
+    }
+
+    public void setAuthorLegibleNames(Map<String, Author> authorsMap) {
+        for (RedditChildrenResponse currentChild : children) {
+            currentChild.getData().setAuthorLegibleName(authorsMap.get(currentChild.getData().getAuthorFullname()).getName());
+        }
     }
 
     public long getDist() {

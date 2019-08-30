@@ -142,7 +142,7 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
             final RedditNewsDataResponse post = childrenResponse.getData();
 
             title.setText(post.getTitle());
-            author.setText(post.getAuthorFullname());
+            author.setText(post.getAuthorLegibleName());
             CharSequence ago = DateUtils.getRelativeTimeSpanString(post.getCreated() * 1000, System.currentTimeMillis(),
                     DateUtils.MINUTE_IN_MILLIS);
             time.setText(ago);
