@@ -1,5 +1,6 @@
 package com.brennan.deviget.redditposts.ui;
 
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +31,16 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
         notifyDataSetChanged();
     }
 
+    public void remove(int position) {
+        mRedditDataResponse.getChildren().remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, mRedditDataResponse.getChildren().size());
+
+    }
+
     public interface Listener {
         void onItemClick(int position, RedditChildrenResponse item);
+        void onDismissItemClick(int position, RedditChildrenResponse item);
     }
 
     public RedditPostAdapter(RedditDataResponse response) {
@@ -100,6 +109,8 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
         TextView comments;
         ImageView thumbnail;
         ViewGroup item;
+        View dismissButton;
+        View dismissText;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -108,6 +119,9 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
             author = itemView.findViewById(R.id.author);
             time = itemView.findViewById(R.id.time);
             comments = itemView.findViewById(R.id.comments);
+            dismissButton = itemView.findViewById(R.id.dismiss_post_image_view);
+            dismissText = itemView.findViewById(R.id.dismiss_post_text);
+
 
             thumbnail = itemView.findViewById(R.id.thumbnail);
 
@@ -119,8 +133,10 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
 
             title.setText(post.getTitle());
             author.setText(post.getAuthorFullname());
-            //TODO format for time ago format
-            time.setText("time" + post.getCreated());
+            CharSequence ago = DateUtils.getRelativeTimeSpanString(post.getCreated() * 1000, System.currentTimeMillis(),
+                    DateUtils.MINUTE_IN_MILLIS);
+            time.setText(ago);
+
             comments.setText(item.getContext().getString(R.string.comments_count, post.getNumComments()));
 
             thumbnail.post(new Runnable() {
@@ -132,11 +148,24 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
                 }
             });
 
+            View.OnClickListener onDismissClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int newPosition = getAdapterPosition();
+                        mListener.onDismissItemClick(newPosition, childrenResponse);
+                    }
+                }
+            };
+            dismissText.setOnClickListener(onDismissClickListener);
+            dismissButton.setOnClickListener(onDismissClickListener);
+
             this.item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mListener != null) {
-                        mListener.onItemClick(position, childrenResponse);
+                        int newPosition = getAdapterPosition();
+                        mListener.onItemClick(newPosition, childrenResponse);
                     }
                 }
             });

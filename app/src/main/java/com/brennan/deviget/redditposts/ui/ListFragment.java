@@ -69,6 +69,11 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
                     mListener.onItemClick(item);
                 }
             }
+
+            @Override
+            public void onDismissItemClick(int position, RedditChildrenResponse item) {
+                mAdapter.remove(position);
+            }
         });
     }
 
