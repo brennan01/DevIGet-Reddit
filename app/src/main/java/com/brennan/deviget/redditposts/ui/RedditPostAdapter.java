@@ -60,7 +60,7 @@ public class RedditPostAdapter extends RecyclerView.Adapter<RedditPostAdapter.Vi
             mRedditDataResponse.getChildren().addAll(redditDataResponse.getChildren());
         }
 
-        mAfter = redditDataResponse.getAfter();
+        mAfter = redditDataResponse == null ? null : redditDataResponse.getAfter();
         notifyDataSetChanged();
     }
 

@@ -2,6 +2,7 @@ package com.brennan.deviget.redditposts.ui;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.Explode;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
 
 import com.brennan.deviget.redditposts.R;
 import com.brennan.deviget.redditposts.domain.RedditChildrenResponse;
@@ -39,7 +43,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
     private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
 
     private RedditPostAdapter mAdapter;
-    private TextView mDismisAll;
+    private TextView mDismissAll;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
@@ -75,6 +79,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
             @Override
             public void onDismissItemClick(int position, RedditChildrenResponse item) {
                 mAdapter.remove(position);
+                updateDismissView();
             }
         });
     }
@@ -90,7 +95,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
-        mDismisAll = view.findViewById(R.id.dismiss_all);
+        mDismissAll = view.findViewById(R.id.dismiss_all);
 
         mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
             @Override
@@ -116,7 +121,7 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(savedInstanceState != null && savedInstanceState.getSerializable(POSTS_LIST) != null){
+        if (savedInstanceState != null) {
             RedditDataResponse data = (RedditDataResponse) savedInstanceState.getSerializable(POSTS_LIST);
             ArrayList<RedditChildrenResponse> readPosts = (ArrayList<RedditChildrenResponse>) savedInstanceState.getSerializable(READ_POSTS_LIST);
             mAdapter.init(data, readPosts);
@@ -124,6 +129,29 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
         } else {
             loadFreshInfo();
         }
+
+        mDismissAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Rect viewRect = new Rect();
+
+                Transition explode = new Explode();
+                explode.setEpicenterCallback(new Transition.EpicenterCallback() {
+                            @Override
+                            public Rect onGetEpicenter(Transition transition) {
+                                return viewRect;
+                            }
+                        });
+                explode.setDuration(1000);
+                TransitionManager.beginDelayedTransition(mRecyclerView, explode);
+
+                mEndlessRecyclerOnScrollListener.reset();
+                mAdapter.clear();
+                updateDismissView();
+
+            }
+        });
 
     }
 
@@ -158,9 +186,9 @@ public class ListFragment extends Fragment implements GetRedditPostFragment.List
     private void updateDismissView() {
         List<RedditChildrenResponse> items = mAdapter.getItems();
         if(items == null || items.size() == 0){
-            mDismisAll.setText(getString(R.string.dismill_all));
+            mDismissAll.setText(getString(R.string.dismill_all));
         } else {
-            mDismisAll.setText(getString(R.string.dismill_all_count,  items.size()));
+            mDismissAll.setText(getString(R.string.dismill_all_count,  items.size()));
         }
     }
 
